@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27520.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessControlClient", "AccessControlClient\AccessControlClient.csproj", "{7B13D54F-64C2-40C1-B18B-C74B8BAB03AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessControlClient.Shared", "AccessControlClient.Shared\AccessControlClient.Shared.csproj", "{BB04F22B-3B39-43C5-9C36-EF504C0AB034}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7B13D54F-64C2-40C1-B18B-C74B8BAB03AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B13D54F-64C2-40C1-B18B-C74B8BAB03AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B13D54F-64C2-40C1-B18B-C74B8BAB03AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B13D54F-64C2-40C1-B18B-C74B8BAB03AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB04F22B-3B39-43C5-9C36-EF504C0AB034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB04F22B-3B39-43C5-9C36-EF504C0AB034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB04F22B-3B39-43C5-9C36-EF504C0AB034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB04F22B-3B39-43C5-9C36-EF504C0AB034}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {509EB9B8-10AE-4111-BC15-A0E8749D8619}
+	EndGlobalSection
+EndGlobal

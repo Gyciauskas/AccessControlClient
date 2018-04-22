@@ -1,0 +1,117 @@
+﻿@page "/users"
+@inject HttpClient Http
+
+<h1>Users</h1>
+
+<a class="btn btn-default" href="/addUser">Add new user</a>
+<br />
+<br />
+<span class="label label-primary">Total users : @totalUsers</span>
+<span class="label label-success">Uploaded in @lasted ms</span>
+<br />
+<table class='table'>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>LastName</th>
+            <th>User Title</th>
+            <th>Department</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (UserModel user in users)
+        {
+            <tr>
+                <td>@user.Firstname</td>
+                <td>@user.Lastname</td>
+                <td>@user.UserTitle</td>
+                <td>@user.Department</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="/userDetails/@user.Id">Details</a>
+                </td>
+                <td>
+                    <a onclick=@(async ()=> await DeleteUserAsync(user.Id, user.Version)) class="btn btn-default btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@functions {
+    List<UserModel> users { get; set; } = new List<UserModel>();
+    long lasted;
+    int totalUsers;
+
+    protected override async Task OnInitAsync()
+    {
+        await GetUserList();
+    }
+
+    private async Task DeleteUserAsync(int id, string version)
+    {
+        Console.WriteLine($"clicked {id}");
+
+        var url = $"http://localhost:58009/api/users/{id}?version={version}";
+
+        Console.WriteLine(url);
+
+        var httpResponse = await Http.DeleteAsync(url);
+
+        Console.WriteLine(httpResponse.StatusCode);
+
+        if (httpResponse.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            await RefreshUserList();
+        }
+    }
+
+    private async Task GetUserList()
+    {
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+
+        var userList = await Http.GetJsonAsync<IEnumerable<User>>("http://localhost:58009/api/users?skip=0&take=10000");
+
+        var userTitles = await Http.GetJsonAsync<IEnumerable<UserTitle>>("http://localhost:58009/api/locations/1/usertitles");
+
+        var departments = await Http.GetJsonAsync<IEnumerable<Department>>("http://localhost:58009/api/locations/1/departments");
+
+        var joinData = from u in userList
+                       join ut in userTitles
+                       on u.userTitleId equals ut.id
+                       join d in departments
+                       on u.departmentId equals d.id
+                       select new UserModel
+                       {
+                           Id = u.id,
+                           Firstname = u.firstName,
+                           Lastname = u.lastName,
+                           UserTitle = ut.name,
+                           Department = d.name,
+                           Version = u.version
+                       };
+
+        users = joinData.OrderBy(u => u.Lastname).ToList();
+
+        watch.Stop();
+        lasted = watch.ElapsedMilliseconds;
+        totalUsers = users.Count();
+    }
+
+    private async Task RefreshUserList()
+    {
+        await GetUserList();
+
+        StateHasChanged();
+    }
+
+    public class UserModel
+    {
+        public int Id { get; set; }
+        public string Firstname { get; set; }
+        public string Lastname { get; set; }
+        public string UserTitle { get; set; }
+        public string Department { get; set; }
+        public string Version { get; set; }
+    }
+}
+

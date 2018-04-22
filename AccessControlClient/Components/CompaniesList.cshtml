@@ -1,0 +1,20 @@
+﻿@inject HttpClient Http
+
+<datalist id="companies">
+    @foreach (var company in _companies)
+    {
+        <option value=@company.name>@company.name</option>
+    }
+</datalist>
+
+@functions
+{
+    private Company[] _companies = Array.Empty<Company>();
+
+    protected override async Task OnInitAsync()
+    {
+        var companies = await Http.GetJsonAsync<IEnumerable<Company>>("http://localhost:58009/api/locations/1/companies");
+
+        _companies = companies.ToArray();
+    }
+}

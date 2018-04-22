@@ -1,0 +1,229 @@
+﻿@page "/addUser"
+
+@inject HttpClient Http
+
+<h1>Add user</h1>
+
+<p>This component demonstrates saving data to the server.</p>
+
+<div class="col-sm-6">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-sm-3">First name:</label>
+            <div class="col-sm-9">
+                <input class="form-control" placeholder="Enter first name" bind="@_user.FirstName" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Last name:</label>
+            <div class="col-sm-9">
+                <input class="form-control" placeholder="Enter last name" bind="@_user.LastName"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Email:</label>
+            <div class="col-sm-9">
+                <input class="form-control" placeholder="Enter email" bind="@_user.Email"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Phone:</label>
+            <div class="col-sm-9">
+                <input class="form-control" placeholder="Enter phone number" bind="@_user.PhoneNumber"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">User type:</label>
+            <div class="col-sm-9">
+                <select class="form-control" bind="@_user.UserType">
+                    @foreach (var userType in Enum.GetValues(typeof(UserType)))
+                    {
+                        <option value=@userType>@userType</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Company:</label>
+            <div class="col-sm-9">
+                @*<input list="_companies" class="form-control" @bind(_user.Company)>*@
+                <select class="form-control" bind="@_user.Company">
+                    <option value=""></option>
+                    @foreach (var company in _companies)
+                    {
+                        <option value=@company.name>@company.name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Department:</label>
+            <div class="col-sm-9">
+                @*<input list="_departments" class="form-control" @bind(_user.Department)>*@
+                <select class="form-control" bind="@_user.Department">
+                    <option value=""></option>
+                    @foreach (var department in _departments)
+                    {
+                        <option value=@department.name>@department.name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">User title:</label>
+            <div class="col-sm-9">
+                @*<input list="_userTitles" class="form-control" @bind(_user.UserTitle)>*@
+                <select class="form-control" bind="@_user.UserTitle">
+                    <option value=""></option>
+                    @foreach (var userTitle in _userTitles)
+                    {
+                        <option value=@userTitle.name>@userTitle.name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Activation date:</label>
+            <div class="col-sm-9">
+                <input type="datetime" class="form-control" bind="@_user.ActivationDate" format-value="yyyy-MM-dd HH:mm"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Expiration date:</label>
+            <div class="col-sm-9">
+                <input class="form-control" placeholder="0001-01-01 00:00" bind="@_user.ExpirationDate" format-value="yyyy-MM-dd HH:mm"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-9">
+                <button onclick="@(async ()=> await AddUserToDb())" class="btn btn-default">Save</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="col-sm-6">
+</div>
+<datalist id="_departments">
+    @foreach (var department in _departments)
+    {
+        <option value=@department.name>@department.name</option>
+    }
+</datalist>
+<datalist id="_userTitles">
+    @foreach (var userTitle in _userTitles)
+    {
+        <option value=@userTitle.name>@userTitle.name</option>
+    }
+</datalist>
+<datalist id="_companies">
+    @foreach (var company in _companies)
+    {
+        <option value=@company.name>@company.name</option>
+    }
+</datalist>
+
+@functions {
+    public UserModel _user { get; set; } = new UserModel { ActivationDate = DateTime.Now, UserType = UserType.Employee };
+
+    private UserTitle[] _userTitles = Array.Empty<UserTitle>();
+    private Department[] _departments = Array.Empty<Department>();
+    private Company[] _companies = Array.Empty<Company>();
+
+    protected override async Task OnInitAsync()
+    {
+        Console.WriteLine(_user.ActivationDate);
+
+        var departments = await Http.GetJsonAsync<IEnumerable<Department>>("http://localhost:58009/api/locations/1/departments");
+
+        var userTitles = await Http.GetJsonAsync<IEnumerable<UserTitle>>("http://localhost:58009/api/locations/1/usertitles");
+
+        var companies = await Http.GetJsonAsync<IEnumerable<Company>>("http://localhost:58009/api/locations/1/companies");
+
+        _companies = companies.OrderBy(u => u.name).ToArray();
+        _departments = departments.OrderBy(u => u.name).ToArray();
+        _userTitles = userTitles.OrderBy(u => u.name).ToArray();
+    }
+
+    private async Task AddUserToDb()
+    {
+        var createUser = new CreateUser();
+
+        Console.WriteLine("saved");
+        Console.WriteLine(_user.UserTitle);
+        Console.WriteLine(_user.Department);
+        Console.WriteLine(_user.Company);
+        Console.WriteLine(_user.UserType);
+        Console.WriteLine(_user.ExpirationDate);
+
+        createUser.FirstName = _user.FirstName;
+        createUser.LastName = _user.LastName;
+        createUser.Email = _user.Email;
+        createUser.PhoneNumber = _user.PhoneNumber;
+        createUser.UserType = _user.UserType;
+
+        // Company
+        var company = _companies.Where(c => c.name == _user.Company).FirstOrDefault();
+
+        if (company != null)
+            createUser.CompanyId = company.id;
+
+        // Department
+        var department = _departments.Where(c => c.name == _user.Department).FirstOrDefault();
+
+        if (department != null)
+            createUser.DepartmentId = department.id;
+
+        // User title
+        var userTitle = _userTitles.Where(c => c.name == _user.UserTitle).FirstOrDefault();
+
+        if (userTitle != null)
+            createUser.UserTitleId = userTitle.id;
+
+        createUser.ActivationDate = _user.ActivationDate;
+        createUser.ExpirationDate = null;
+
+        var result = await Http.PostJsonAsync<int>("http://localhost:58009/api/users", createUser);
+
+        Console.WriteLine(result);
+    }
+
+
+    public class CreateCompany
+    {
+        public string Name { get; set; }
+    }
+
+    public class UserModel
+    {
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string MiddleName { get; set; }
+
+        public string Email { get; set; }
+
+        public string PhoneNumber { get; set; }
+
+        public UserType UserType { get; set; }
+
+        public string Company { get; set; }
+
+        public string Department { get; set; }
+
+        public string UserTitle { get; set; }
+
+        public DateTime ActivationDate { get; set; }
+
+        public DateTime ExpirationDate { get; set; }
+
+        public string Additional1 { get; set; }
+
+        public string Additional2 { get; set; }
+
+        public string Additional3 { get; set; }
+    }
+}
+
+
+
