@@ -8,23 +8,23 @@
     <form action="/action_page.php">
         <div class="form-group">
             <label>First name:</label>
-            <input class="form-control" bind="@_userDetails.firstName"/>
+            <input class="form-control" bind="@_userDetails.firstName" />
         </div>
         <div class="form-group">
             <label>Middle name:</label>
-            <input class="form-control" bind="@_userDetails.middleName"/>
+            <input class="form-control" bind="@_userDetails.middleName" />
         </div>
         <div class="form-group">
             <label>Last name:</label>
-            <input class="form-control" bind="@_userDetails.lastName"/>
+            <input class="form-control" bind="@_userDetails.lastName" />
         </div>
         <div class="form-group">
             <label>Email:</label>
-            <input class="form-control" bind="@_userDetails.email"/>
+            <input class="form-control" bind="@_userDetails.email" />
         </div>
         <div class="form-group">
             <label>Phone:</label>
-            <input class="form-control" bind="@_userDetails.phoneNumber"/>
+            <input class="form-control" bind="@_userDetails.phoneNumber" />
         </div>
         <div class="form-group">
             <label>User type:</label>
@@ -44,35 +44,39 @@
         </div>
         <div class="form-group">
             <label>Company</label>
-            <input class="form-control" bind="@_userDetails.company"/>
+            <input class="form-control" bind="@_userDetails.company" />
         </div>
         <div class="form-group">
             <label>Department</label>
-            <input class="form-control" bind="@_userDetails.department"/>
+            <input class="form-control" bind="@_userDetails.department" />
         </div>
         <div class="form-group">
             <label>User title</label>
-            <input class="form-control" bind="@_userDetails.userTitle"/>
+            <input class="form-control" bind="@_userDetails.userTitle" />
+        </div>
+        <div class="form-group">
+            <label>Access level</label>
+            <input class="form-control"/>
         </div>
         <div class="form-group">
             <label>Activation date:</label>
-            <input type="datetime" class="form-control" bind="@_userDetails.activationDate" format-value="yyyy-MM-dd HH:mm"/>
+            <input type="datetime" class="form-control" bind="@_userDetails.activationDate" format-value="yyyy-MM-dd HH:mm" />
         </div>
         <div class="form-group">
             <label>Expiration date:</label>
-            <input type="datetime" class="form-control" placeholder="0001-01-01 00:00" bind="@_userDetails.expirationDate"/>
+            <input type="datetime" class="form-control" placeholder="0001-01-01 00:00" bind="@_userDetails.expirationDate" />
         </div>
         <div class="form-group">
             <label>Additional 1</label>
-            <input class="form-control" bind="@_userDetails.additional1"/>
+            <input class="form-control" bind="@_userDetails.additional1" />
         </div>
         <div class="form-group">
             <label>Additional 2</label>
-            <input class="form-control" bind="@_userDetails.additional2"/>
+            <input class="form-control" bind="@_userDetails.additional2" />
         </div>
         <div class="form-group">
             <label>Additional 3</label>
-            <input class="form-control" bind="@_userDetails.additional3"/>
+            <input class="form-control" bind="@_userDetails.additional3" />
         </div>
         <div class="form-group">
             <button class="btn btn-default">Save</button>

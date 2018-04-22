@@ -2,38 +2,35 @@
 
 @inject HttpClient Http
 
-<h1>Add user</h1>
-
-<p>This component demonstrates saving data to the server.</p>
-
 <div class="col-sm-6">
+    <h1>Create new user</h1>
     <form class="form-horizontal">
         <div class="form-group">
-            <label class="control-label col-sm-3">First name:</label>
+            <label class="control-label col-sm-3">First name</label>
             <div class="col-sm-9">
                 <input class="form-control" placeholder="Enter first name" bind="@_user.FirstName" />
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">Last name:</label>
+            <label class="control-label col-sm-3">Last name</label>
             <div class="col-sm-9">
-                <input class="form-control" placeholder="Enter last name" bind="@_user.LastName"/>
+                <input class="form-control" placeholder="Enter last name" bind="@_user.LastName" />
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">Email:</label>
+            <label class="control-label col-sm-3">Email</label>
             <div class="col-sm-9">
-                <input class="form-control" placeholder="Enter email" bind="@_user.Email"/>
+                <input class="form-control" placeholder="Enter email" bind="@_user.Email" />
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">Phone:</label>
+            <label class="control-label col-sm-3">Phone</label>
             <div class="col-sm-9">
-                <input class="form-control" placeholder="Enter phone number" bind="@_user.PhoneNumber"/>
+                <input class="form-control" placeholder="Enter phone number" bind="@_user.PhoneNumber" />
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">User type:</label>
+            <label class="control-label col-sm-3">User type</label>
             <div class="col-sm-9">
                 <select class="form-control" bind="@_user.UserType">
                     @foreach (var userType in Enum.GetValues(typeof(UserType)))
@@ -44,7 +41,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">Company:</label>
+            <label class="control-label col-sm-3">Company</label>
             <div class="col-sm-9">
                 @*<input list="_companies" class="form-control" @bind(_user.Company)>*@
                 <select class="form-control" bind="@_user.Company">
@@ -57,7 +54,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">Department:</label>
+            <label class="control-label col-sm-3">Department</label>
             <div class="col-sm-9">
                 @*<input list="_departments" class="form-control" @bind(_user.Department)>*@
                 <select class="form-control" bind="@_user.Department">
@@ -70,7 +67,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">User title:</label>
+            <label class="control-label col-sm-3">User title</label>
             <div class="col-sm-9">
                 @*<input list="_userTitles" class="form-control" @bind(_user.UserTitle)>*@
                 <select class="form-control" bind="@_user.UserTitle">
@@ -83,15 +80,42 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">Activation date:</label>
+            <label class="control-label col-sm-3">Access level</label>
             <div class="col-sm-9">
-                <input type="datetime" class="form-control" bind="@_user.ActivationDate" format-value="yyyy-MM-dd HH:mm"/>
+                <select class="form-control">
+                    <option value="">Everywhere</option>
+                    <option value="">Nowhere</option>
+                </select>
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">Expiration date:</label>
+            <label class="control-label col-sm-3">Activation date</label>
             <div class="col-sm-9">
-                <input class="form-control" placeholder="0001-01-01 00:00" bind="@_user.ExpirationDate" format-value="yyyy-MM-dd HH:mm"/>
+                <input type="datetime" class="form-control" bind="@_user.ActivationDate" format-value="yyyy-MM-dd HH:mm" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Expiration date</label>
+            <div class="col-sm-9">
+                <input class="form-control" placeholder="0001-01-01 00:00" bind="@_user.ExpirationDate" format-value="yyyy-MM-dd HH:mm" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Additional 1</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_user.Additional1" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Additional 2</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_user.Additional2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Additional 3</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_user.Additional3" />
             </div>
         </div>
         <div class="form-group">
@@ -186,7 +210,6 @@
 
         Console.WriteLine(result);
     }
-
 
     public class CreateCompany
     {

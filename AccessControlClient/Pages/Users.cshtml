@@ -28,10 +28,11 @@
                 <td>@user.Department</td>
                 <td>
                     <a class="btn btn-primary btn-sm" href="/userDetails/@user.Id">Details</a>
-                </td>
-                <td>
                     <a onclick=@(async ()=> await DeleteUserAsync(user.Id, user.Version)) class="btn btn-default btn-sm">Delete</a>
                 </td>
+                @*<td>
+                   <a onclick=@(async ()=> await DeleteUserAsync(user.Id, user.Version)) class="btn btn-default btn-sm">Delete</
+                </td>*@
             </tr>
         }
     </tbody>
