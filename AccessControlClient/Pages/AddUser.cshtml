@@ -127,7 +127,7 @@
 </div>
 <div class="col-sm-6">
 </div>
-<datalist id="_departments">
+@*<datalist id="_departments">
     @foreach (var department in _departments)
     {
         <option value=@department.name>@department.name</option>
@@ -144,9 +144,10 @@
     {
         <option value=@company.name>@company.name</option>
     }
-</datalist>
+</datalist>*@
 
 @functions {
+    const string BaseUrl = "http://localhost:58009/api";
     public UserModel _user { get; set; } = new UserModel { ActivationDate = DateTime.Now, UserType = UserType.Employee };
 
     private UserTitle[] _userTitles = Array.Empty<UserTitle>();
@@ -157,11 +158,11 @@
     {
         Console.WriteLine(_user.ActivationDate);
 
-        var departments = await Http.GetJsonAsync<IEnumerable<Department>>("http://localhost:58009/api/locations/1/departments");
+        var departments = await Http.GetJsonAsync<IEnumerable<Department>>($"{BaseUrl}/locations/1/departments");
 
-        var userTitles = await Http.GetJsonAsync<IEnumerable<UserTitle>>("http://localhost:58009/api/locations/1/usertitles");
+        var userTitles = await Http.GetJsonAsync<IEnumerable<UserTitle>>($"{BaseUrl}/locations/1/usertitles");
 
-        var companies = await Http.GetJsonAsync<IEnumerable<Company>>("http://localhost:58009/api/locations/1/companies");
+        var companies = await Http.GetJsonAsync<IEnumerable<Company>>($"{BaseUrl}/locations/1/companies");
 
         _companies = companies.OrderBy(u => u.name).ToArray();
         _departments = departments.OrderBy(u => u.name).ToArray();
@@ -206,7 +207,7 @@
         createUser.ActivationDate = _user.ActivationDate;
         createUser.ExpirationDate = null;
 
-        var result = await Http.PostJsonAsync<int>("http://localhost:58009/api/users", createUser);
+        var result = await Http.PostJsonAsync<int>($"{BaseUrl}/users", createUser);
 
         Console.WriteLine(result);
     }

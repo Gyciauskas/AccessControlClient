@@ -5,120 +5,140 @@
 </div>
 <div class="col-sm-6">
     <h1>User details</h1>
-    <form action="/action_page.php">
+    <form class="form-horizontal">
         <div class="form-group">
-            <label>First name:</label>
-            <input class="form-control" bind="@_userDetails.firstName" />
+            <label class="control-label col-sm-3">First name</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_userDetails.firstName" />
+            </div>
         </div>
         <div class="form-group">
-            <label>Middle name:</label>
-            <input class="form-control" bind="@_userDetails.middleName" />
+            <label class="control-label col-sm-3">Middle name</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_userDetails.middleName" />
+            </div>
         </div>
         <div class="form-group">
-            <label>Last name:</label>
-            <input class="form-control" bind="@_userDetails.lastName" />
+            <label class="control-label col-sm-3">Last name</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_userDetails.lastName" />
+            </div>
         </div>
         <div class="form-group">
-            <label>Email:</label>
-            <input class="form-control" bind="@_userDetails.email" />
+            <label class="control-label col-sm-3">Email</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_userDetails.email" />
+            </div>
         </div>
         <div class="form-group">
-            <label>Phone:</label>
-            <input class="form-control" bind="@_userDetails.phoneNumber" />
+            <label class="control-label col-sm-3">Phone</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_userDetails.phoneNumber" />
+            </div>
         </div>
         <div class="form-group">
-            <label>User type:</label>
-            <select class="form-control" bind="@_userDetails.userType">
-                @foreach (var userType in Enum.GetValues(typeof(UserType)))
-                {
-                    if ((UserType)userType == UserType.Employee)
+            <label class="control-label col-sm-3">User type</label>
+            <div class="col-sm-9">
+                <select class="form-control" bind="@_userDetails.userType">
+                    @foreach (var userType in Enum.GetValues(typeof(UserType)))
                     {
-                        <option value=@userType selected> @userType </option>
+                        <option value=@userType>@userType</option>
                     }
-                    else
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Company</label>
+            <div class="col-sm-9">
+                @*<input class="form-control" bind="@_userDetails.company" />*@
+                <select class="form-control" bind="@_userDetails.company">
+                    @foreach (var company in _companies)
                     {
-                        <option value=@userType> @userType </option>
+                        <option value=@company.name>@company.name</option>
                     }
-                }
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Company</label>
-            <input class="form-control" bind="@_userDetails.company" />
-        </div>
-        <div class="form-group">
-            <label>Department</label>
-            <input class="form-control" bind="@_userDetails.department" />
-        </div>
-        <div class="form-group">
-            <label>User title</label>
-            <input class="form-control" bind="@_userDetails.userTitle" />
-        </div>
-        <div class="form-group">
-            <label>Access level</label>
-            <input class="form-control"/>
-        </div>
-        <div class="form-group">
-            <label>Activation date:</label>
-            <input type="datetime" class="form-control" bind="@_userDetails.activationDate" format-value="yyyy-MM-dd HH:mm" />
-        </div>
-        <div class="form-group">
-            <label>Expiration date:</label>
-            <input type="datetime" class="form-control" placeholder="0001-01-01 00:00" bind="@_userDetails.expirationDate" />
-        </div>
-        <div class="form-group">
-            <label>Additional 1</label>
-            <input class="form-control" bind="@_userDetails.additional1" />
-        </div>
-        <div class="form-group">
-            <label>Additional 2</label>
-            <input class="form-control" bind="@_userDetails.additional2" />
-        </div>
-        <div class="form-group">
-            <label>Additional 3</label>
-            <input class="form-control" bind="@_userDetails.additional3" />
-        </div>
-        <div class="form-group">
-            <button class="btn btn-default">Save</button>
-        </div>
-        @*<div class="form-group">
-            <label class="control-label col-sm-3">Company:</label>
-            <div class="col-sm-9">
-                <input list="companies" class="form-control" @bind(_user.Company)>
+                </select>
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">Department:</label>
+            <label class="control-label col-sm-3">Department</label>
             <div class="col-sm-9">
-                <input list="departments" class="form-control" @bind(_user.Department)>
+                @*<input class="form-control" bind="@_userDetails.department" />*@
+                <select class="form-control" bind="@_userDetails.department">
+                    @foreach (var department in _departments)
+                    {
+                        <option value=@department.name>@department.name</option>
+                    }
+                </select>
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">User title:</label>
+            <label class="control-label col-sm-3">User title</label>
             <div class="col-sm-9">
-                <input list="userTitles" class="form-control" @bind(_user.UserTitle)>
+                @*<input class="form-control" bind="@_userDetails.userTitle" />*@
+                <select class="form-control" bind="@_userDetails.userTitle">
+                    @foreach (var userTitle in _userTitles)
+                    {
+                        <option value=@userTitle.name>@userTitle.name</option>
+                    }
+                </select>
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-3">Activation date:</label>
+            <label class="control-label col-sm-3">Access level</label>
             <div class="col-sm-9">
-                <input type="datetime-local" class="form-control" value="2017-06-01T08:30" @bind(_user.MiddleName)>
+                <input class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Activation date</label>
+            <div class="col-sm-9">
+                <input type="datetime" class="form-control" bind="@_userDetails.activationDate" format-value="yyyy-MM-dd HH:mm" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Expiration date</label>
+            <div class="col-sm-9">
+                <input type="datetime" class="form-control" placeholder="0001-01-01 00:00" bind="@_userDetails.expirationDate" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Additional 1</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_userDetails.additional1" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Additional 2</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_userDetails.additional2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-3">Additional 3</label>
+            <div class="col-sm-9">
+                <input class="form-control" bind="@_userDetails.additional3" />
             </div>
         </div>
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
-                <button @onclick(async () => await AddUserToDb()) class="btn btn-default">Save</button>
+                <button class="btn btn-default">Save</button>
             </div>
-        </div>*@
+        </div>
     </form>
 </div>
 <div class="col-sm-5">
 </div>
 
 @functions {
+    const string BaseUrl = "http://localhost:58009/api";
+
     public string UserId { get; set; }
     User _user = new User();
     public UserDetailModel _userDetails { get; set; } = new UserDetailModel();
+
+    private UserTitle[] _userTitles = Array.Empty<UserTitle>();
+    private Department[] _departments = Array.Empty<Department>();
+    private Company[] _companies = Array.Empty<Company>();
 
     protected override async void OnInit()
     {
@@ -126,15 +146,11 @@
 
         Console.WriteLine(UserId);
 
-        var url = $"http://localhost:58009/api/users/{UserId}";
-
-        _user = await Http.GetJsonAsync<User>(url);
+        _user = await Http.GetJsonAsync<User>($"{BaseUrl}/users/{UserId}");
 
         if (_user.companyId != null)
         {
-            url = $"http://localhost:58009/api/locations/1/companies/{_user.companyId}";
-
-            var company = await Http.GetJsonAsync<Company>(url);
+            var company = await Http.GetJsonAsync<Company>($"{BaseUrl}/locations/1/companies/{_user.companyId}");
 
             additionalInfo.company = company.name;
 
@@ -143,9 +159,7 @@
 
         if (_user.departmentId != null)
         {
-            url = $"http://localhost:58009/api/locations/1/departments/{_user.departmentId}";
-
-            var department = await Http.GetJsonAsync<Department>(url);
+            var department = await Http.GetJsonAsync<Department>($"{BaseUrl}/locations/1/departments/{_user.departmentId}");
 
             additionalInfo.department = department.name;
 
@@ -154,9 +168,7 @@
 
         if (_user.userTitleId != null)
         {
-            url = $"http://localhost:58009/api/locations/1/usertitles/{_user.userTitleId}";
-
-            var userTitle = await Http.GetJsonAsync<UserTitle>(url);
+            var userTitle = await Http.GetJsonAsync<UserTitle>($"{BaseUrl}/locations/1/usertitles/{_user.userTitleId}");
 
             additionalInfo.userTitle = userTitle.name;
 
@@ -166,6 +178,17 @@
         // need access levels also
 
         _userDetails = MapUserData(_user, additionalInfo);
+
+        // additional info
+        var departments = await Http.GetJsonAsync<IEnumerable<Department>>($"{BaseUrl}/locations/1/departments");
+
+        var userTitles = await Http.GetJsonAsync<IEnumerable<UserTitle>>($"{BaseUrl}/locations/1/usertitles");
+
+        var companies = await Http.GetJsonAsync<IEnumerable<Company>>($"{BaseUrl}/locations/1/companies");
+
+        _companies = companies.OrderBy(u => u.name).ToArray();
+        _departments = departments.OrderBy(u => u.name).ToArray();
+        _userTitles = userTitles.OrderBy(u => u.name).ToArray();
 
         StateHasChanged();
     }
@@ -194,16 +217,11 @@
 
     private async void UserAccessLevels(int userId)
     {
-        var url = $"http://localhost:58009/api/users/{UserId}/accesslevels";
+        var userAccesslevels = await Http.GetJsonAsync<IEnumerable<UserAccessLevel>>($"{BaseUrl}/users/{UserId}/accesslevels");
 
-        var userAccesslevels = await Http.GetJsonAsync<IEnumerable<UserAccessLevel>>(url);
-
-        url = $" /api/locations/1/accesslevels";
-
-        var accesslevels = await Http.GetJsonAsync<IEnumerable<AccessLevel>>(url);
+        var accesslevels = await Http.GetJsonAsync<IEnumerable<AccessLevel>>($"{BaseUrl}/locations/1/accesslevels");
 
         // get access levels names
-
 
     }
 

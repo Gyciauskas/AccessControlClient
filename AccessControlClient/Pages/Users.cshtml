@@ -1,4 +1,4 @@
-﻿@page "/users"
+﻿@page "/"
 @inject HttpClient Http
 
 <h1>Users</h1>
@@ -30,15 +30,14 @@
                     <a class="btn btn-primary btn-sm" href="/userDetails/@user.Id">Details</a>
                     <a onclick=@(async ()=> await DeleteUserAsync(user.Id, user.Version)) class="btn btn-default btn-sm">Delete</a>
                 </td>
-                @*<td>
-                   <a onclick=@(async ()=> await DeleteUserAsync(user.Id, user.Version)) class="btn btn-default btn-sm">Delete</
-                </td>*@
             </tr>
         }
     </tbody>
 </table>
 
 @functions {
+    const string BaseUrl = "http://localhost:58009/api";
+
     List<UserModel> users { get; set; } = new List<UserModel>();
     long lasted;
     int totalUsers;
@@ -52,11 +51,7 @@
     {
         Console.WriteLine($"clicked {id}");
 
-        var url = $"http://localhost:58009/api/users/{id}?version={version}";
-
-        Console.WriteLine(url);
-
-        var httpResponse = await Http.DeleteAsync(url);
+        var httpResponse = await Http.DeleteAsync($"{BaseUrl}/users/{id}?version={version}");
 
         Console.WriteLine(httpResponse.StatusCode);
 
@@ -70,11 +65,11 @@
     {
         var watch = System.Diagnostics.Stopwatch.StartNew();
 
-        var userList = await Http.GetJsonAsync<IEnumerable<User>>("http://localhost:58009/api/users?skip=0&take=10000");
+        var userList = await Http.GetJsonAsync<IEnumerable<User>>($"{BaseUrl}/users?skip=0&take=100");
 
-        var userTitles = await Http.GetJsonAsync<IEnumerable<UserTitle>>("http://localhost:58009/api/locations/1/usertitles");
+        var userTitles = await Http.GetJsonAsync<IEnumerable<UserTitle>>($"{BaseUrl}/locations/1/usertitles");
 
-        var departments = await Http.GetJsonAsync<IEnumerable<Department>>("http://localhost:58009/api/locations/1/departments");
+        var departments = await Http.GetJsonAsync<IEnumerable<Department>>($"{BaseUrl}/locations/1/departments");
 
         var joinData = from u in userList
                        join ut in userTitles
