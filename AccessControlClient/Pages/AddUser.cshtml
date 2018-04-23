@@ -160,7 +160,6 @@
     private Company[] _companies = Array.Empty<Company>();
     private AccessLevel[] _accessLevels = Array.Empty<AccessLevel>();
 
-
     protected override async Task OnInitAsync()
     {
         Console.WriteLine(_user.ActivationDate);
@@ -221,17 +220,29 @@
 
         if (result > 0)
         {
-            //var userAccesslevel = new AccessLevel { }
+            var userAccesslevel = new UserAccessLevel
+            {
+                AccessLevelId = _user.AccessLevelId,
+                ActivationDate = _user.ActivationDate,
+                ExpirationDate = null,
+                UseLimit = 0,
+                Status = UserAccessLevelStatus.Active
+            };
 
-            //result = await Http.PostJsonAsync<int>($"{BaseUrl}/users/{result}/accesslevels", createUser);
+            var rez = await Http.PostJsonAsync<int>($"{BaseUrl}/users/{result}/accesslevels", userAccesslevel);
         }
 
-        Console.WriteLine(result);
+        Console.WriteLine($"User ID: {result}");
     }
 
     public class CreateCompany
     {
         public string Name { get; set; }
+    }
+
+    public class UserResult
+    {
+        public int id { get; set; }
     }
 
     public class UserModel
