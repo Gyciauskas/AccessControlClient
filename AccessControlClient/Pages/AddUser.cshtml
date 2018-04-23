@@ -83,8 +83,11 @@
             <label class="control-label col-sm-3">Access level</label>
             <div class="col-sm-9">
                 <select class="form-control">
-                    <option value="">Everywhere</option>
-                    <option value="">Nowhere</option>
+                    <option value=""></option>
+                    @foreach (var accesslevel in _accessLevels)
+                    {
+                        <option value=@accesslevel.name>@accesslevel.name</option>
+                    }
                 </select>
             </div>
         </div>
@@ -147,12 +150,16 @@
 </datalist>*@
 
 @functions {
-    const string BaseUrl = "http://localhost:58009/api";
+    //const string BaseUrl = "http://localhost:58009/api";
+    const string BaseUrl = "http://hub.midpoint.lt:58009/api";
+
     public UserModel _user { get; set; } = new UserModel { ActivationDate = DateTime.Now, UserType = UserType.Employee };
 
     private UserTitle[] _userTitles = Array.Empty<UserTitle>();
     private Department[] _departments = Array.Empty<Department>();
     private Company[] _companies = Array.Empty<Company>();
+    private AccessLevel[] _accessLevels = Array.Empty<AccessLevel>();
+
 
     protected override async Task OnInitAsync()
     {
@@ -164,9 +171,12 @@
 
         var companies = await Http.GetJsonAsync<IEnumerable<Company>>($"{BaseUrl}/locations/1/companies");
 
+        var accesslevels = await Http.GetJsonAsync<IEnumerable<AccessLevel>>($"{BaseUrl}/locations/1/accesslevels");
+
         _companies = companies.OrderBy(u => u.name).ToArray();
         _departments = departments.OrderBy(u => u.name).ToArray();
         _userTitles = userTitles.OrderBy(u => u.name).ToArray();
+        _accessLevels = accesslevels.OrderBy(u => u.name).ToArray();
     }
 
     private async Task AddUserToDb()
@@ -209,6 +219,13 @@
 
         var result = await Http.PostJsonAsync<int>($"{BaseUrl}/users", createUser);
 
+        if (result > 0)
+        {
+            //var userAccesslevel = new AccessLevel { }
+
+            //result = await Http.PostJsonAsync<int>($"{BaseUrl}/users/{result}/accesslevels", createUser);
+        }
+
         Console.WriteLine(result);
     }
 
@@ -236,6 +253,8 @@
         public string Department { get; set; }
 
         public string UserTitle { get; set; }
+
+        public int AccessLevelId { get; set; }
 
         public DateTime ActivationDate { get; set; }
 

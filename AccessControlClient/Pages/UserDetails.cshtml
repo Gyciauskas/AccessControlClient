@@ -130,7 +130,8 @@
 </div>
 
 @functions {
-    const string BaseUrl = "http://localhost:58009/api";
+    //const string BaseUrl = "http://localhost:58009/api";
+    const string BaseUrl = "http://hub.midpoint.lt:58009/api";
 
     public string UserId { get; set; }
     User _user = new User();
@@ -222,7 +223,6 @@
         var accesslevels = await Http.GetJsonAsync<IEnumerable<AccessLevel>>($"{BaseUrl}/locations/1/accesslevels");
 
         // get access levels names
-
     }
 
     private class AdditionalInfo

@@ -8,16 +8,16 @@
         /// <summary>
         /// Id
         /// </summary>
-        public int Id { get; set; }
+        public int id { get; set; }
 
         /// <summary>
         /// Name
         /// </summary>
-        public string Name { get; set; }
+        public string name { get; set; }
 
         /// <summary>
         /// Version
         /// </summary>
-        public string Version { get; set; }
+        public string version { get; set; } 
     }
 }
