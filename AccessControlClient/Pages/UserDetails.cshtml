@@ -86,7 +86,13 @@
         <div class="form-group">
             <label class="control-label col-sm-3">Access level</label>
             <div class="col-sm-9">
-                <input class="form-control" />
+                @*<input class="form-control" bind="@_userDetails.userAccesslevel" />*@
+                <select class="form-control" bind="@_userDetails.userAccesslevel">
+                    @foreach (var assignableUserAccessLevels in _assignableUserAccessLevels)
+                    {
+                        <option value=@assignableUserAccessLevels.name>@assignableUserAccessLevels.name</option>
+                    }
+                </select>
             </div>
         </div>
         <div class="form-group">
@@ -140,6 +146,7 @@
     private UserTitle[] _userTitles = Array.Empty<UserTitle>();
     private Department[] _departments = Array.Empty<Department>();
     private Company[] _companies = Array.Empty<Company>();
+    private AssignableUserAccessLevel[] _assignableUserAccessLevels = Array.Empty<AssignableUserAccessLevel>();
 
     protected override async void OnInit()
     {
@@ -176,7 +183,15 @@
             Console.WriteLine(userTitle.name);
         }
 
-        // need access levels also
+        // need access levels
+        var userAccesslevels = await Http.GetJsonAsync<IEnumerable<UserAccessLevel>>($"{BaseUrl}/users/{UserId}/accesslevels");
+
+        Console.WriteLine($"accesslevels: {userAccesslevels.Count()}");
+
+        if (userAccesslevels.Count() > 0)
+            additionalInfo.accesslevel = userAccesslevels.First().name;
+
+        var assignableUserAccesslevels = await Http.GetJsonAsync<IEnumerable<AssignableUserAccessLevel>>($"{BaseUrl}/users/{UserId}/assignable-accesslevels");
 
         _userDetails = MapUserData(_user, additionalInfo);
 
@@ -190,6 +205,7 @@
         _companies = companies.OrderBy(u => u.name).ToArray();
         _departments = departments.OrderBy(u => u.name).ToArray();
         _userTitles = userTitles.OrderBy(u => u.name).ToArray();
+        _assignableUserAccessLevels = assignableUserAccesslevels.OrderBy(u => u.name).ToArray();
 
         StateHasChanged();
     }
@@ -208,6 +224,7 @@
             company = additionalInfo.company,
             department = additionalInfo.department,
             userTitle = additionalInfo.userTitle,
+            userAccesslevel = additionalInfo.accesslevel,
             activationDate = user.activationDate,
             expirationDate = user.expirationDate?.ToString("yyyy-MM-dd HH:mm"),
             additional1 = user.additional1,
@@ -230,6 +247,7 @@
         public string company { get; set; }
         public string department { get; set; }
         public string userTitle { get; set; }
+        public string accesslevel { get; set; }
     }
 
     public class UserDetailModel
@@ -257,6 +275,8 @@
         public DateTime activationDate { get; set; }
 
         public string expirationDate { get; set; }
+
+        public string userAccesslevel { get; set; }
 
         public string additional1 { get; set; }
 

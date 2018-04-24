@@ -82,7 +82,7 @@
         <div class="form-group">
             <label class="control-label col-sm-3">Access level</label>
             <div class="col-sm-9">
-                <select class="form-control">
+                <select class="form-control" bind="@_user.AccessLevel">
                     <option value=""></option>
                     @foreach (var accesslevel in _accessLevels)
                     {
@@ -130,24 +130,6 @@
 </div>
 <div class="col-sm-6">
 </div>
-@*<datalist id="_departments">
-    @foreach (var department in _departments)
-    {
-        <option value=@department.name>@department.name</option>
-    }
-</datalist>
-<datalist id="_userTitles">
-    @foreach (var userTitle in _userTitles)
-    {
-        <option value=@userTitle.name>@userTitle.name</option>
-    }
-</datalist>
-<datalist id="_companies">
-    @foreach (var company in _companies)
-    {
-        <option value=@company.name>@company.name</option>
-    }
-</datalist>*@
 
 @functions {
     //const string BaseUrl = "http://localhost:58009/api";
@@ -218,21 +200,29 @@
 
         var result = await Http.PostJsonAsync<int>($"{BaseUrl}/users", createUser);
 
+        Console.WriteLine($"User ID: {result}");
+
+        // Add access level
         if (result > 0)
         {
-            var userAccesslevel = new UserAccessLevel
+            var accesslevel = _accessLevels.Where(c => c.name == _user.AccessLevel).FirstOrDefault();
+
+            if (accesslevel != null)
             {
-                AccessLevelId = _user.AccessLevelId,
-                ActivationDate = _user.ActivationDate,
-                ExpirationDate = null,
-                UseLimit = 0,
-                Status = UserAccessLevelStatus.Active
-            };
+                var userAccesslevel = new CreateUserAccesslevel
+                {
+                    AccessLevelId = accesslevel.id,
+                    ActivationDate = _user.ActivationDate,
+                    ExpirationDate = null,
+                    UseLimit = 0,
+                    Status = UserAccessLevelStatus.Active
+                };
 
-            var rez = await Http.PostJsonAsync<int>($"{BaseUrl}/users/{result}/accesslevels", userAccesslevel);
+                var rez = await Http.PostJsonAsync<int>($"{BaseUrl}/users/{result}/accesslevels", userAccesslevel);
+
+                Console.WriteLine($"Access level ID: {result}");
+            }
         }
-
-        Console.WriteLine($"User ID: {result}");
     }
 
     public class CreateCompany
@@ -265,7 +255,7 @@
 
         public string UserTitle { get; set; }
 
-        public int AccessLevelId { get; set; }
+        public string AccessLevel { get; set; }
 
         public DateTime ActivationDate { get; set; }
 
