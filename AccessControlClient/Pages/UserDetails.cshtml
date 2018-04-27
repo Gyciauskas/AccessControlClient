@@ -136,11 +136,11 @@
 </div>
 
 @functions {
-    //const string BaseUrl = "http://localhost:58009/api";
-    const string BaseUrl = "http://hub.midpoint.lt:58009/api";
+    const string BaseUrl = "http://localhost:58009/api";
+    //const string BaseUrl = "http://hub.midpoint.lt:58009/api";
 
     public string UserId { get; set; }
-    User _user = new User();
+    SpecificUser _user = new SpecificUser();
     public UserDetailModel _userDetails { get; set; } = new UserDetailModel();
 
     private UserTitle[] _userTitles = Array.Empty<UserTitle>();
@@ -154,7 +154,7 @@
 
         Console.WriteLine(UserId);
 
-        _user = await Http.GetJsonAsync<User>($"{BaseUrl}/users/{UserId}");
+        _user = await Http.GetJsonAsync<SpecificUser>($"{BaseUrl}/users/{UserId}");
 
         if (_user.companyId != null)
         {
@@ -210,7 +210,7 @@
         StateHasChanged();
     }
 
-    private UserDetailModel MapUserData(User user, AdditionalInfo additionalInfo)
+    private UserDetailModel MapUserData(SpecificUser user, AdditionalInfo additionalInfo)
     {
         return new UserDetailModel
         {

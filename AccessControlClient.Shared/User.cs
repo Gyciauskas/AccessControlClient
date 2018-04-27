@@ -1,39 +1,48 @@
-﻿using System;
-
-namespace AccessControlClient.Shared
+﻿namespace AccessControlClient.Shared
 {
+    /// <summary>
+    /// User object
+    /// </summary>
     public class User
     {
+        /// <summary>
+        /// Id
+        /// </summary>
         public int id { get; set; }
 
+        /// <summary>
+        /// First name
+        /// </summary>
         public string firstName { get; set; }
 
+        /// <summary>
+        /// Last name
+        /// </summary>
         public string lastName { get; set; }
 
-        public string middleName { get; set; }
+        /// <summary>
+        /// Company name
+        /// </summary>
+        public string companyName { get; set; }
 
-        public string email { get; set; }
+        /// <summary>
+        /// Department name
+        /// </summary>
+        public string departmentName { get; set; }
 
-        public string phoneNumber { get; set; }
+        /// <summary>
+        /// User title name
+        /// </summary>
+        public string userTitleName { get; set; }
 
-        public UserType userType { get; set; }
+        /// <summary>
+        /// Employee number
+        /// </summary>
+        public string employeeNumber { get; set; }
 
-        public int? companyId { get; set; }
-
-        public int? departmentId { get; set; }
-
-        public int? userTitleId { get; set; }
-
-        public DateTime activationDate { get; set; }
-
-        public DateTime? expirationDate { get; set; }
-
-        public string additional1 { get; set; }
-
-        public string additional2 { get; set; }
-
-        public string additional3 { get; set; }
-
+        /// <summary>
+        /// Version
+        /// </summary>
         public string version { get; set; }
     }
 }

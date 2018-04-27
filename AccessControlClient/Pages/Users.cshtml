@@ -6,14 +6,31 @@
 <a class="btn btn-default" href="/addUser">Add new user</a>
 <br />
 <br />
-<span class="label label-primary">Total users : @totalUsers</span>
-<span class="label label-success">Uploaded in @lasted ms</span>
-<br />
+<div class="row">
+    <div class="col-sm-6">
+        <span class="label label-primary">Total users : @totalUsers</span>
+        <span class="label label-success">Uploaded in @lasted ms</span>
+    </div>
+    <div class="col-sm-2">
+    </div>
+    <div class="col-sm-4">
+        <form>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search" bind="@searchKey" />
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit" onclick=@(async ()=> await SeachUsers(searchKey))><i class="glyphicon glyphicon-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 <table class='table'>
     <thead>
         <tr>
             <th>Name</th>
             <th>LastName</th>
+
             <th>User Title</th>
             <th>Department</th>
         </tr>
@@ -36,16 +53,42 @@
 </table>
 
 @functions {
-    //const string BaseUrl = "http://localhost:58009/api";
-    const string BaseUrl = "http://hub.midpoint.lt:58009/api";
+    const string BaseUrl = "http://localhost:58009/api";
+    //const string BaseUrl = "http://hub.midpoint.lt:58009/api";
 
     List<UserModel> users { get; set; } = new List<UserModel>();
     long lasted;
     int totalUsers;
+    string searchKey;
 
     protected override async Task OnInitAsync()
     {
         await GetUserList();
+    }
+
+    private async Task SeachUsers(string searchKey)
+    {
+        Console.WriteLine($"searching {searchKey}");
+
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+
+        var userList = await Http.GetJsonAsync<IEnumerable<User>>($"{BaseUrl}/users?skip=0&take=500&search={searchKey}");
+
+        users = userList.Select(u => new UserModel
+        {
+            Id = u.id,
+            Firstname = u.firstName,
+            Lastname = u.lastName,
+            UserTitle = u.userTitleName,
+            Department = u.departmentName,
+            Version = u.version
+        }).OrderBy(u => u.Lastname).ToList();
+
+        watch.Stop();
+        lasted = watch.ElapsedMilliseconds;
+        totalUsers = users.Count();
+
+        StateHasChanged();
     }
 
     private async Task DeleteUserAsync(int id, string version)
@@ -66,28 +109,17 @@
     {
         var watch = System.Diagnostics.Stopwatch.StartNew();
 
-        var userList = await Http.GetJsonAsync<IEnumerable<User>>($"{BaseUrl}/users?skip=0&take=100");
+        var userList = await Http.GetJsonAsync<IEnumerable<User>>($"{BaseUrl}/users?skip=0&take=500");
 
-        var userTitles = await Http.GetJsonAsync<IEnumerable<UserTitle>>($"{BaseUrl}/locations/1/usertitles");
-
-        var departments = await Http.GetJsonAsync<IEnumerable<Department>>($"{BaseUrl}/locations/1/departments");
-
-        var joinData = from u in userList
-                       join ut in userTitles
-                       on u.userTitleId equals ut.id
-                       join d in departments
-                       on u.departmentId equals d.id
-                       select new UserModel
-                       {
-                           Id = u.id,
-                           Firstname = u.firstName,
-                           Lastname = u.lastName,
-                           UserTitle = ut.name,
-                           Department = d.name,
-                           Version = u.version
-                       };
-
-        users = joinData.OrderBy(u => u.Lastname).ToList();
+        users = userList.Select(u => new UserModel
+        {
+            Id = u.id,
+            Firstname = u.firstName,
+            Lastname = u.lastName,
+            UserTitle = u.userTitleName,
+            Department = u.departmentName,
+            Version = u.version
+        }).OrderBy(u => u.Lastname).ToList();
 
         watch.Stop();
         lasted = watch.ElapsedMilliseconds;
