@@ -1,16 +1,22 @@
-﻿using Microsoft.AspNetCore.Blazor.Browser.Rendering;
+﻿using AccessControlClient.Repositories;
+using AccessControlClient.Repositories.Contracts;
+using Microsoft.AspNetCore.Blazor.Browser.Rendering;
 using Microsoft.AspNetCore.Blazor.Browser.Services;
-using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AccessControlClient
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
             var serviceProvider = new BrowserServiceProvider(configure =>
             {
-                // Add any custom services here
+                configure.Add(ServiceDescriptor.Singleton<IUserRepository, UserRepository>());
+                configure.Add(ServiceDescriptor.Singleton<IDepartmentRepository, DepartmentRepository>());
+                configure.Add(ServiceDescriptor.Singleton<ICompanyRepository, CompanyRepository>());
+                configure.Add(ServiceDescriptor.Singleton<IUserTitleRepository, UserTitleRepository>());
+                configure.Add(ServiceDescriptor.Singleton<IAccessLevelRepository, AccessLevelRepository>());
             });
 
             new BrowserRenderer(serviceProvider).AddComponent<App>("app");

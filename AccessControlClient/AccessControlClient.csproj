@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.0-preview2-final" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.Blazor.Browser" Version="0.2.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.Browser" Version="0.2.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.2.1" />
     <DotNetCliToolReference Include="Microsoft.AspNetCore.Blazor.Cli" Version="0.2.0" />
   </ItemGroup>
 
@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <None Include="Pages\AddUser.cshtml" />
+    <None Include="Pages\Index.cshtml" />
     <None Include="Pages\UserDetails.cshtml" />
     <None Include="Pages\Users.cshtml" />
   </ItemGroup>
@@ -49,6 +50,14 @@
 
   <ItemGroup>
     <Content Remove="Pages\UserDetails.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <BlazorGenerate Remove="Pages\Index.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Pages\Index.cshtml" />
   </ItemGroup>
 
 </Project>

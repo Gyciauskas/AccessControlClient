@@ -1,5 +1,5 @@
 ﻿@page "/addUser"
-
+@inherits ComponentBases
 @inject HttpClient Http
 
 <div class="col-sm-6">
@@ -8,31 +8,31 @@
         <div class="form-group">
             <label class="control-label col-sm-3">First name</label>
             <div class="col-sm-9">
-                <input class="form-control" placeholder="Enter first name" bind="@_user.FirstName" />
+                <input class="form-control" placeholder="Enter first name" bind="@_user.firstName" />
             </div>
         </div>
         <div class="form-group">
             <label class="control-label col-sm-3">Last name</label>
             <div class="col-sm-9">
-                <input class="form-control" placeholder="Enter last name" bind="@_user.LastName" />
+                <input class="form-control" placeholder="Enter last name" bind="@_user.lastName" />
             </div>
         </div>
         <div class="form-group">
             <label class="control-label col-sm-3">Email</label>
             <div class="col-sm-9">
-                <input class="form-control" placeholder="Enter email" bind="@_user.Email" />
+                <input class="form-control" placeholder="Enter email" bind="@_user.email" />
             </div>
         </div>
         <div class="form-group">
             <label class="control-label col-sm-3">Phone</label>
             <div class="col-sm-9">
-                <input class="form-control" placeholder="Enter phone number" bind="@_user.PhoneNumber" />
+                <input class="form-control" placeholder="Enter phone number" bind="@_user.phoneNumber" />
             </div>
         </div>
         <div class="form-group">
             <label class="control-label col-sm-3">User type</label>
             <div class="col-sm-9">
-                <select class="form-control" bind="@_user.UserType">
+                <select class="form-control" bind="@_user.userType">
                     @foreach (var userType in Enum.GetValues(typeof(UserType)))
                     {
                         <option value=@userType>@userType</option>
@@ -44,7 +44,7 @@
             <label class="control-label col-sm-3">Company</label>
             <div class="col-sm-9">
                 @*<input list="_companies" class="form-control" @bind(_user.Company)>*@
-                <select class="form-control" bind="@_user.Company">
+                <select class="form-control" bind="@_user.company">
                     <option value=""></option>
                     @foreach (var company in _companies)
                     {
@@ -57,7 +57,7 @@
             <label class="control-label col-sm-3">Department</label>
             <div class="col-sm-9">
                 @*<input list="_departments" class="form-control" @bind(_user.Department)>*@
-                <select class="form-control" bind="@_user.Department">
+                <select class="form-control" bind="@_user.department">
                     <option value=""></option>
                     @foreach (var department in _departments)
                     {
@@ -70,7 +70,7 @@
             <label class="control-label col-sm-3">User title</label>
             <div class="col-sm-9">
                 @*<input list="_userTitles" class="form-control" @bind(_user.UserTitle)>*@
-                <select class="form-control" bind="@_user.UserTitle">
+                <select class="form-control" bind="@_user.userTitle">
                     <option value=""></option>
                     @foreach (var userTitle in _userTitles)
                     {
@@ -82,7 +82,7 @@
         <div class="form-group">
             <label class="control-label col-sm-3">Access level</label>
             <div class="col-sm-9">
-                <select class="form-control" bind="@_user.AccessLevel">
+                <select class="form-control" bind="@_user.userAccesslevel">
                     <option value=""></option>
                     @foreach (var accesslevel in _accessLevels)
                     {
@@ -94,31 +94,31 @@
         <div class="form-group">
             <label class="control-label col-sm-3">Activation date</label>
             <div class="col-sm-9">
-                <input type="datetime" class="form-control" bind="@_user.ActivationDate" format-value="yyyy-MM-dd HH:mm" />
+                <input type="datetime" class="form-control" bind="@_user.activationDate" format-value="yyyy-MM-dd HH:mm" />
             </div>
         </div>
         <div class="form-group">
             <label class="control-label col-sm-3">Expiration date</label>
             <div class="col-sm-9">
-                <input class="form-control" placeholder="0001-01-01 00:00" bind="@_user.ExpirationDate" format-value="yyyy-MM-dd HH:mm" />
+                <input class="form-control" placeholder="0001-01-01 00:00" bind="@_user.expirationDate" />
             </div>
         </div>
         <div class="form-group">
             <label class="control-label col-sm-3">Additional 1</label>
             <div class="col-sm-9">
-                <input class="form-control" bind="@_user.Additional1" />
+                <input class="form-control" bind="@_user.additional1" />
             </div>
         </div>
         <div class="form-group">
             <label class="control-label col-sm-3">Additional 2</label>
             <div class="col-sm-9">
-                <input class="form-control" bind="@_user.Additional2" />
+                <input class="form-control" bind="@_user.additional2" />
             </div>
         </div>
         <div class="form-group">
             <label class="control-label col-sm-3">Additional 3</label>
             <div class="col-sm-9">
-                <input class="form-control" bind="@_user.Additional3" />
+                <input class="form-control" bind="@_user.additional3" />
             </div>
         </div>
         <div class="form-group">
@@ -132,10 +132,10 @@
 </div>
 
 @functions {
-    const string BaseUrl = "http://localhost:58009/api";
-    //const string BaseUrl = "http://hub.midpoint.lt:58009/api";
+    //const string BaseUrl = "http://localhost:58009/api";
+    const string BaseUrl = "http://hub.midpoint.lt:58009/api";
 
-    public UserModel _user { get; set; } = new UserModel { ActivationDate = DateTime.Now, UserType = UserType.Employee };
+    public UserModel _user { get; set; } = new UserModel { activationDate = DateTime.Now, userType = UserType.Employee };
 
     private UserTitle[] _userTitles = Array.Empty<UserTitle>();
     private Department[] _departments = Array.Empty<Department>();
@@ -144,59 +144,53 @@
 
     protected override async Task OnInitAsync()
     {
-        Console.WriteLine(_user.ActivationDate);
+        var departments = await DepartmentRepository.GetDepartmentsAsync();
 
-        var departments = await Http.GetJsonAsync<IEnumerable<Department>>($"{BaseUrl}/locations/1/departments");
+        var companies = await CompanyRepository.GetCompaniesAsync();
 
-        var userTitles = await Http.GetJsonAsync<IEnumerable<UserTitle>>($"{BaseUrl}/locations/1/usertitles");
+        var userTitles = await UserTitleRepository.GetUserTitlesAsync();
 
-        var companies = await Http.GetJsonAsync<IEnumerable<Company>>($"{BaseUrl}/locations/1/companies");
+        var accesslevels = await AccessLevelRepository.GetAccessLevelsAsync();
 
-        var accesslevels = await Http.GetJsonAsync<IEnumerable<AccessLevel>>($"{BaseUrl}/locations/1/accesslevels");
-
-        _companies = companies.OrderBy(u => u.name).ToArray();
-        _departments = departments.OrderBy(u => u.name).ToArray();
-        _userTitles = userTitles.OrderBy(u => u.name).ToArray();
-        _accessLevels = accesslevels.OrderBy(u => u.name).ToArray();
+        _companies = companies.ToArray();
+        _departments = departments.ToArray();
+        _userTitles = userTitles.ToArray();
+        _accessLevels = accesslevels.ToArray();
     }
 
     private async Task AddUserToDb()
     {
-        var createUser = new CreateUser();
-
-        Console.WriteLine("saved");
-        Console.WriteLine(_user.UserTitle);
-        Console.WriteLine(_user.Department);
-        Console.WriteLine(_user.Company);
-        Console.WriteLine(_user.UserType);
-        Console.WriteLine(_user.ExpirationDate);
-
-        createUser.FirstName = _user.FirstName;
-        createUser.LastName = _user.LastName;
-        createUser.Email = _user.Email;
-        createUser.PhoneNumber = _user.PhoneNumber;
-        createUser.UserType = _user.UserType;
+        var createUser = new CreateUser
+        {
+            FirstName = _user.firstName,
+            LastName = _user.lastName,
+            Email = _user.email,
+            PhoneNumber = _user.phoneNumber,
+            UserType = _user.userType,
+        };
 
         // Company
-        var company = _companies.Where(c => c.name == _user.Company).FirstOrDefault();
+        var company = _companies.Where(c => c.name == _user.company).FirstOrDefault();
 
         if (company != null)
             createUser.CompanyId = company.id;
 
         // Department
-        var department = _departments.Where(c => c.name == _user.Department).FirstOrDefault();
+        var department = _departments.Where(c => c.name == _user.department).FirstOrDefault();
 
         if (department != null)
             createUser.DepartmentId = department.id;
 
         // User title
-        var userTitle = _userTitles.Where(c => c.name == _user.UserTitle).FirstOrDefault();
+        var userTitle = _userTitles.Where(c => c.name == _user.userTitle).FirstOrDefault();
 
         if (userTitle != null)
             createUser.UserTitleId = userTitle.id;
 
-        createUser.ActivationDate = _user.ActivationDate;
-        createUser.ExpirationDate = null;
+        createUser.ActivationDate = _user.activationDate;
+
+        //if (string.IsNullOrEmpty(_user.expirationDate))
+        //createUser.ExpirationDate = date; // format-value="yyyy-MM-dd HH:mm"
 
         var result = await Http.PostJsonAsync<int>($"{BaseUrl}/users", createUser);
 
@@ -205,14 +199,14 @@
         // Add access level
         if (result > 0)
         {
-            var accesslevel = _accessLevels.Where(c => c.name == _user.AccessLevel).FirstOrDefault();
+            var accesslevel = _accessLevels.Where(c => c.name == _user.userAccesslevel).FirstOrDefault();
 
             if (accesslevel != null)
             {
                 var userAccesslevel = new CreateUserAccesslevel
                 {
                     AccessLevelId = accesslevel.id,
-                    ActivationDate = _user.ActivationDate,
+                    ActivationDate = _user.activationDate,
                     ExpirationDate = null,
                     UseLimit = 0,
                     Status = UserAccessLevelStatus.Active
@@ -223,49 +217,6 @@
                 Console.WriteLine($"Access level ID: {result}");
             }
         }
-    }
-
-    public class CreateCompany
-    {
-        public string Name { get; set; }
-    }
-
-    public class UserResult
-    {
-        public int id { get; set; }
-    }
-
-    public class UserModel
-    {
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public string MiddleName { get; set; }
-
-        public string Email { get; set; }
-
-        public string PhoneNumber { get; set; }
-
-        public UserType UserType { get; set; }
-
-        public string Company { get; set; }
-
-        public string Department { get; set; }
-
-        public string UserTitle { get; set; }
-
-        public string AccessLevel { get; set; }
-
-        public DateTime ActivationDate { get; set; }
-
-        public DateTime ExpirationDate { get; set; }
-
-        public string Additional1 { get; set; }
-
-        public string Additional2 { get; set; }
-
-        public string Additional3 { get; set; }
     }
 }
 

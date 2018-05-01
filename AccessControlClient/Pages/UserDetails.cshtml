@@ -1,5 +1,6 @@
 ﻿@page "/userDetails/{UserId}"
 @inject HttpClient Http
+@inherits ComponentBases
 
 <div class="col-sm-1">
 </div>
@@ -52,6 +53,7 @@
             <div class="col-sm-9">
                 @*<input class="form-control" bind="@_userDetails.company" />*@
                 <select class="form-control" bind="@_userDetails.company">
+                    <option value=""></option>
                     @foreach (var company in _companies)
                     {
                         <option value=@company.name>@company.name</option>
@@ -64,6 +66,7 @@
             <div class="col-sm-9">
                 @*<input class="form-control" bind="@_userDetails.department" />*@
                 <select class="form-control" bind="@_userDetails.department">
+                    <option value=""></option>
                     @foreach (var department in _departments)
                     {
                         <option value=@department.name>@department.name</option>
@@ -76,6 +79,7 @@
             <div class="col-sm-9">
                 @*<input class="form-control" bind="@_userDetails.userTitle" />*@
                 <select class="form-control" bind="@_userDetails.userTitle">
+                    <option value=""></option>
                     @foreach (var userTitle in _userTitles)
                     {
                         <option value=@userTitle.name>@userTitle.name</option>
@@ -88,6 +92,7 @@
             <div class="col-sm-9">
                 @*<input class="form-control" bind="@_userDetails.userAccesslevel" />*@
                 <select class="form-control" bind="@_userDetails.userAccesslevel">
+                    <option value=""></option>
                     @foreach (var assignableUserAccessLevels in _assignableUserAccessLevels)
                     {
                         <option value=@assignableUserAccessLevels.name>@assignableUserAccessLevels.name</option>
@@ -127,7 +132,7 @@
         </div>
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
-                <button class="btn btn-default">Save</button>
+                <button onclick="@(async ()=> await UpdateUser())" class="btn btn-default">Save</button>
             </div>
         </div>
     </form>
@@ -136,12 +141,9 @@
 </div>
 
 @functions {
-    const string BaseUrl = "http://localhost:58009/api";
-    //const string BaseUrl = "http://hub.midpoint.lt:58009/api";
-
     public string UserId { get; set; }
     SpecificUser _user = new SpecificUser();
-    public UserDetailModel _userDetails { get; set; } = new UserDetailModel();
+    public UserModel _userDetails { get; set; } = new UserModel();
 
     private UserTitle[] _userTitles = Array.Empty<UserTitle>();
     private Department[] _departments = Array.Empty<Department>();
@@ -152,13 +154,11 @@
     {
         var additionalInfo = new AdditionalInfo();
 
-        Console.WriteLine(UserId);
-
-        _user = await Http.GetJsonAsync<SpecificUser>($"{BaseUrl}/users/{UserId}");
+        _user = await UserRepository.GetUserAsync(int.Parse(UserId));
 
         if (_user.companyId != null)
         {
-            var company = await Http.GetJsonAsync<Company>($"{BaseUrl}/locations/1/companies/{_user.companyId}");
+            var company = await CompanyRepository.GetCompanyAsync((int)_user.companyId);
 
             additionalInfo.company = company.name;
 
@@ -167,7 +167,7 @@
 
         if (_user.departmentId != null)
         {
-            var department = await Http.GetJsonAsync<Department>($"{BaseUrl}/locations/1/departments/{_user.departmentId}");
+            var department = await DepartmentRepository.GetDepartmentAsync((int)_user.departmentId);
 
             additionalInfo.department = department.name;
 
@@ -176,7 +176,7 @@
 
         if (_user.userTitleId != null)
         {
-            var userTitle = await Http.GetJsonAsync<UserTitle>($"{BaseUrl}/locations/1/usertitles/{_user.userTitleId}");
+            var userTitle = await UserTitleRepository.GetUserTitleAsync((int)_user.userTitleId);
 
             additionalInfo.userTitle = userTitle.name;
 
@@ -184,35 +184,70 @@
         }
 
         // need access levels
-        var userAccesslevels = await Http.GetJsonAsync<IEnumerable<UserAccessLevel>>($"{BaseUrl}/users/{UserId}/accesslevels");
+        var userAccesslevels = await UserRepository.GetUserAccesslevels(_user.id);
 
         Console.WriteLine($"accesslevels: {userAccesslevels.Count()}");
 
-        if (userAccesslevels.Count() > 0)
+        if (userAccesslevels.Any())
             additionalInfo.accesslevel = userAccesslevels.First().name;
 
-        var assignableUserAccesslevels = await Http.GetJsonAsync<IEnumerable<AssignableUserAccessLevel>>($"{BaseUrl}/users/{UserId}/assignable-accesslevels");
+        var assignableUserAccesslevels = await UserRepository.GetAssignableUserAccessLevels(_user.id);
 
         _userDetails = MapUserData(_user, additionalInfo);
 
         // additional info
-        var departments = await Http.GetJsonAsync<IEnumerable<Department>>($"{BaseUrl}/locations/1/departments");
+        var departments = await DepartmentRepository.GetDepartmentsAsync();
 
-        var userTitles = await Http.GetJsonAsync<IEnumerable<UserTitle>>($"{BaseUrl}/locations/1/usertitles");
+        var userTitles = await UserTitleRepository.GetUserTitlesAsync();
 
-        var companies = await Http.GetJsonAsync<IEnumerable<Company>>($"{BaseUrl}/locations/1/companies");
+        var companies = await CompanyRepository.GetCompaniesAsync();
 
-        _companies = companies.OrderBy(u => u.name).ToArray();
-        _departments = departments.OrderBy(u => u.name).ToArray();
-        _userTitles = userTitles.OrderBy(u => u.name).ToArray();
-        _assignableUserAccessLevels = assignableUserAccesslevels.OrderBy(u => u.name).ToArray();
+        _companies = companies.ToArray();
+        _departments = departments.ToArray();
+        _userTitles = userTitles.ToArray();
+        _assignableUserAccessLevels = assignableUserAccesslevels.ToArray();
+
+        Console.WriteLine($"user accesslevel: {_userDetails.userAccesslevel}");
 
         StateHasChanged();
     }
 
-    private UserDetailModel MapUserData(SpecificUser user, AdditionalInfo additionalInfo)
+    private async Task UpdateUser()
     {
-        return new UserDetailModel
+        _user.firstName = _userDetails.firstName;
+        _user.middleName = _userDetails.middleName;
+        _user.lastName = _userDetails.lastName;
+        _user.email = _userDetails.email;
+        _user.phoneNumber = _userDetails.phoneNumber;
+        _user.userType = _userDetails.userType;
+        _user.additional1 = _userDetails.additional1;
+        _user.additional2 = _userDetails.additional2;
+        _user.additional3 = _userDetails.additional3;
+
+        // company
+        if (!string.IsNullOrEmpty(_userDetails.company))
+            _user.companyId = _companies.First(c => c.name == _userDetails.company).id;
+        else
+            _user.companyId = null;
+
+        // department
+        if (!string.IsNullOrEmpty(_userDetails.department))
+            _user.departmentId = _departments.First(c => c.name == _userDetails.department).id;
+        else
+            _user.departmentId = null;
+
+        // userTitle
+        if (!string.IsNullOrEmpty(_userDetails.userTitle))
+            _user.userTitleId = _userTitles.First(c => c.name == _userDetails.userTitle).id;
+        else
+            _user.userTitleId = null;
+
+        await UserRepository.UpdateUserAsync(_user);
+    }
+
+    private UserModel MapUserData(SpecificUser user, AdditionalInfo additionalInfo)
+    {
+        return new UserModel
         {
             id = user.id,
             firstName = user.firstName,
@@ -233,57 +268,11 @@
         };
     }
 
-    private async void UserAccessLevels(int userId)
-    {
-        var userAccesslevels = await Http.GetJsonAsync<IEnumerable<UserAccessLevel>>($"{BaseUrl}/users/{UserId}/accesslevels");
-
-        var accesslevels = await Http.GetJsonAsync<IEnumerable<AccessLevel>>($"{BaseUrl}/locations/1/accesslevels");
-
-        // get access levels names
-    }
-
     private class AdditionalInfo
     {
         public string company { get; set; }
         public string department { get; set; }
         public string userTitle { get; set; }
         public string accesslevel { get; set; }
-    }
-
-    public class UserDetailModel
-    {
-        public int id { get; set; }
-
-        public string firstName { get; set; }
-
-        public string lastName { get; set; }
-
-        public string middleName { get; set; }
-
-        public string email { get; set; }
-
-        public string phoneNumber { get; set; }
-
-        public UserType userType { get; set; }
-
-        public string company { get; set; }
-
-        public string department { get; set; }
-
-        public string userTitle { get; set; }
-
-        public DateTime activationDate { get; set; }
-
-        public string expirationDate { get; set; }
-
-        public string userAccesslevel { get; set; }
-
-        public string additional1 { get; set; }
-
-        public string additional2 { get; set; }
-
-        public string additional3 { get; set; }
-
-        public string version { get; set; }
     }
 }

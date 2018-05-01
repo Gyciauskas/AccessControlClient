@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject HttpClient Http
+@inherits ComponentBases
 
 <h1>Users</h1>
 
@@ -11,14 +12,15 @@
         <span class="label label-primary">Total users : @totalUsers</span>
         <span class="label label-success">Uploaded in @lasted ms</span>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-1">
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-5">
         <form>
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="Search" bind="@searchKey" />
                 <div class="input-group-btn">
-                    <button class="btn btn-default" type="submit" onclick=@(async ()=> await SeachUsers(searchKey))><i class="glyphicon glyphicon-search"></i>
+                    <button class="btn btn-default" type="submit" onclick=@(async ()=> await SeachUsers(searchKey))>
+                        <i class="glyphicon glyphicon-search"></i>
                     </button>
                 </div>
             </div>
@@ -30,117 +32,82 @@
         <tr>
             <th>Name</th>
             <th>LastName</th>
-
-            <th>User Title</th>
+            <th>Company</th>
             <th>Department</th>
+            <th>User Title</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (UserModel user in users)
+        @foreach (UsersModel user in _users)
         {
-            <tr>
-                <td>@user.Firstname</td>
-                <td>@user.Lastname</td>
-                <td>@user.UserTitle</td>
-                <td>@user.Department</td>
-                <td>
-                    <a class="btn btn-primary btn-sm" href="/userDetails/@user.Id">Details</a>
-                    <a onclick=@(async ()=> await DeleteUserAsync(user.Id, user.Version)) class="btn btn-default btn-sm">Delete</a>
-                </td>
-            </tr>
+        <tr>
+            <td>@user.Firstname</td>
+            <td>@user.Lastname</td>
+            <td>@user.Company</td>
+            <td>@user.Department</td>
+            <td>@user.UserTitle</td>
+            <td>
+                <a class="btn btn-default btn-sm" href="/userDetails/@user.Id">Details</a>
+                <a onclick=@(async ()=> await DeleteUserAsync(user.Id, user.Version)) class="btn btn-primary btn-sm">Delete</a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>
 
 @functions {
-    const string BaseUrl = "http://localhost:58009/api";
-    //const string BaseUrl = "http://hub.midpoint.lt:58009/api";
+List<UsersModel> _users { get; set; } = new List<UsersModel>();
+long lasted;
+int totalUsers;
+string searchKey;
 
-    List<UserModel> users { get; set; } = new List<UserModel>();
-    long lasted;
-    int totalUsers;
-    string searchKey;
-
-    protected override async Task OnInitAsync()
-    {
-        await GetUserList();
-    }
-
-    private async Task SeachUsers(string searchKey)
-    {
-        Console.WriteLine($"searching {searchKey}");
-
-        var watch = System.Diagnostics.Stopwatch.StartNew();
-
-        var userList = await Http.GetJsonAsync<IEnumerable<User>>($"{BaseUrl}/users?skip=0&take=500&search={searchKey}");
-
-        users = userList.Select(u => new UserModel
-        {
-            Id = u.id,
-            Firstname = u.firstName,
-            Lastname = u.lastName,
-            UserTitle = u.userTitleName,
-            Department = u.departmentName,
-            Version = u.version
-        }).OrderBy(u => u.Lastname).ToList();
-
-        watch.Stop();
-        lasted = watch.ElapsedMilliseconds;
-        totalUsers = users.Count();
-
-        StateHasChanged();
-    }
-
-    private async Task DeleteUserAsync(int id, string version)
-    {
-        Console.WriteLine($"clicked {id}");
-
-        var httpResponse = await Http.DeleteAsync($"{BaseUrl}/users/{id}?version={version}");
-
-        Console.WriteLine(httpResponse.StatusCode);
-
-        if (httpResponse.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-            await RefreshUserList();
-        }
-    }
-
-    private async Task GetUserList()
-    {
-        var watch = System.Diagnostics.Stopwatch.StartNew();
-
-        var userList = await Http.GetJsonAsync<IEnumerable<User>>($"{BaseUrl}/users?skip=0&take=500");
-
-        users = userList.Select(u => new UserModel
-        {
-            Id = u.id,
-            Firstname = u.firstName,
-            Lastname = u.lastName,
-            UserTitle = u.userTitleName,
-            Department = u.departmentName,
-            Version = u.version
-        }).OrderBy(u => u.Lastname).ToList();
-
-        watch.Stop();
-        lasted = watch.ElapsedMilliseconds;
-        totalUsers = users.Count();
-    }
-
-    private async Task RefreshUserList()
-    {
-        await GetUserList();
-
-        StateHasChanged();
-    }
-
-    public class UserModel
-    {
-        public int Id { get; set; }
-        public string Firstname { get; set; }
-        public string Lastname { get; set; }
-        public string UserTitle { get; set; }
-        public string Department { get; set; }
-        public string Version { get; set; }
-    }
+protected override async Task OnInitAsync()
+{
+    await GetUsers();
 }
 
+private async Task SeachUsers(string searchKey)
+{
+    await GetUsers(searchKey);
+
+    StateHasChanged();
+}
+
+private async Task DeleteUserAsync(int id, string version)
+{
+    var statusCode = await UserRepository.DeleteUserAsync(id, version);
+
+    if (statusCode == (int)System.Net.HttpStatusCode.OK) await RefreshUsers();
+}
+
+private async Task GetUsers(string search = null)
+{
+    var watch = System.Diagnostics.Stopwatch.StartNew();
+
+    var users = await UserRepository.GetUsersAsync(search);
+
+    _users = users.Select(u => new UsersModel
+    {
+        Id = u.id,
+        Firstname = u.firstName,
+        Lastname = u.lastName,
+        Company = u.companyName,
+        UserTitle = u.userTitleName,
+        Department = u.departmentName,
+        Version = u.version
+    })
+    .OrderBy(u => u.Lastname).ToList();
+
+    watch.Stop();
+    lasted = watch.ElapsedMilliseconds;
+    totalUsers = users.Count();
+}
+
+private async Task RefreshUsers()
+{
+    await GetUsers();
+
+    StateHasChanged();
+}
+}

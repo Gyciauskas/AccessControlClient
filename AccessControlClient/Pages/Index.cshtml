@@ -1,0 +1,22 @@
+﻿@*@page "/"
+@using DependencyInjection.Services
+@inject IUserRepository UserRepository
+
+<ul>
+    @if (Customers != null)
+    {
+        @foreach (var customer in Customers)
+        {
+            <li>@customer.FirstName @customer.LastName</li>
+        }
+    }
+</ul>
+
+@functions {
+private IReadOnlyList<Customer> Customers;
+
+protected override async Task OnInitAsync()
+{
+    Customers = await UserRepository.GetAllCustomersAsync();
+}
+}*@
