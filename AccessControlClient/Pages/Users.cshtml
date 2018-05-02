@@ -4,110 +4,114 @@
 
 <h1>Users</h1>
 
-<a class="btn btn-default" href="/addUser">Add new user</a>
-<br />
-<br />
-<div class="row">
-    <div class="col-sm-6">
-        <span class="label label-primary">Total users : @totalUsers</span>
-        <span class="label label-success">Uploaded in @lasted ms</span>
-    </div>
-    <div class="col-sm-1">
-    </div>
-    <div class="col-sm-5">
-        <form>
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Search" bind="@searchKey" />
-                <div class="input-group-btn">
-                    <button class="btn btn-default" type="submit" onclick=@(async ()=> await SeachUsers(searchKey))>
-                        <i class="glyphicon glyphicon-search"></i>
-                    </button>
+@if (_users == null) 
+{
+    <p>Loading...</p>
+}
+else 
+{
+    <a class="btn btn-default" href="/addUser">Add new user</a>
+    <br />
+    <br />
+    <div class="row">
+        <div class="col-sm-6">
+            <span class="label label-primary">Total users : @totalUsers</span>
+            <span class="label label-success">Uploaded in @lasted ms</span>
+        </div>
+        <div class="col-sm-2">
+        </div>
+        <div class="col-sm-4">
+            <form>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" bind="@searchKey" />
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" type="submit" onclick=@(async ()=> await SeachUsers(searchKey))>
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
-<table class='table'>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>LastName</th>
-            <th>Company</th>
-            <th>Department</th>
-            <th>User Title</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (UsersModel user in _users)
-        {
-        <tr>
-            <td>@user.Firstname</td>
-            <td>@user.Lastname</td>
-            <td>@user.Company</td>
-            <td>@user.Department</td>
-            <td>@user.UserTitle</td>
-            <td>
-                <a class="btn btn-default btn-sm" href="/userDetails/@user.Id">Details</a>
-                <a onclick=@(async ()=> await DeleteUserAsync(user.Id, user.Version)) class="btn btn-primary btn-sm">Delete</a>
-            </td>
-        </tr>
-        }
-    </tbody>
-</table>
-
+    <table class='table'>
+        <thead>
+            <tr>
+                <th class="col-md-2">Name</th>
+                <th class="col-md-2">LastName</th>
+                <th class="col-md-3">Department</th>
+                <th class="col-md-3">User Title</th>
+                <th class="col-md-2"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (UsersModel user in _users)
+            {
+            <tr>
+                <td>@user.Firstname</td>
+                <td>@user.Lastname</td>
+                <td>@user.Department</td>
+                <td>@user.UserTitle</td>
+                <td>
+                    <a class="btn btn-default btn-sm" href="/userDetails/@user.Id">Details</a>
+                    <a onclick=@(async ()=> await DeleteUserAsync(user.Id, user.Version)) class="btn btn-primary btn-sm">Delete</a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
 @functions {
-List<UsersModel> _users { get; set; } = new List<UsersModel>();
-long lasted;
-int totalUsers;
-string searchKey;
+    List<UsersModel> _users;
+    long lasted;
+    int totalUsers;
+    string searchKey;
 
-protected override async Task OnInitAsync()
-{
-    await GetUsers();
-}
-
-private async Task SeachUsers(string searchKey)
-{
-    await GetUsers(searchKey);
-
-    StateHasChanged();
-}
-
-private async Task DeleteUserAsync(int id, string version)
-{
-    var statusCode = await UserRepository.DeleteUserAsync(id, version);
-
-    if (statusCode == (int)System.Net.HttpStatusCode.OK) await RefreshUsers();
-}
-
-private async Task GetUsers(string search = null)
-{
-    var watch = System.Diagnostics.Stopwatch.StartNew();
-
-    var users = await UserRepository.GetUsersAsync(search);
-
-    _users = users.Select(u => new UsersModel
+    protected override async Task OnInitAsync()
     {
-        Id = u.id,
-        Firstname = u.firstName,
-        Lastname = u.lastName,
-        Company = u.companyName,
-        UserTitle = u.userTitleName,
-        Department = u.departmentName,
-        Version = u.version
-    })
-    .OrderBy(u => u.Lastname).ToList();
+        await GetUsers();
+    }
 
-    watch.Stop();
-    lasted = watch.ElapsedMilliseconds;
-    totalUsers = users.Count();
-}
+    private async Task SeachUsers(string searchKey)
+    {
+        await GetUsers(searchKey);
 
-private async Task RefreshUsers()
-{
-    await GetUsers();
+        StateHasChanged();
+    }
 
-    StateHasChanged();
-}
+    private async Task DeleteUserAsync(int id, string version)
+    {
+        var statusCode = await UserRepository.DeleteUserAsync(id, version);
+
+        if (statusCode == (int)System.Net.HttpStatusCode.OK) await RefreshUsers();
+    }
+
+    private async Task GetUsers(string search = null)
+    {
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+
+        var users = await UserRepository.GetUsersAsync(search);
+
+        _users = users.Select(u => new UsersModel
+        {
+            Id = u.id,
+            Firstname = u.firstName,
+            Lastname = u.lastName,
+            Company = u.companyName,
+            UserTitle = u.userTitleName,
+            Department = u.departmentName,
+            Version = u.version
+        })
+        .OrderBy(u => u.Lastname).ToList();
+
+        watch.Stop();
+        lasted = watch.ElapsedMilliseconds;
+        totalUsers = users.Count();
+    }
+
+    private async Task RefreshUsers()
+    {
+        await GetUsers();
+
+        StateHasChanged();
+    }
 }

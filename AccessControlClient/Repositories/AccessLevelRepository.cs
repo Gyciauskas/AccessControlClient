@@ -10,8 +10,8 @@ namespace AccessControlClient.Repositories
 {
     public class AccessLevelRepository : IAccessLevelRepository
     {
-        //const string BaseUrl = "http://localhost:58009/api";
-        const string BaseUrl = "http://hub.midpoint.lt:58009/api";
+        const string BaseUrl = "http://localhost:58009/api";
+        //const string BaseUrl = "http://hub.midpoint.lt:58009/api";
 
         private readonly HttpClient _httpClient;
 
